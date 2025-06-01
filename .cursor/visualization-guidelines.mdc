@@ -1,0 +1,123 @@
+---
+description: 可视化指导规则
+globs: 
+alwaysApply: false
+---
+# 可视化指导规则
+
+## 图表清单总览
+详细图表示例参见：[图表分析_示例清单.md](mdc:guidance/图表分析_示例清单.md)
+
+## 核心图表类型与用途
+
+### 1. 产品类型分布图（饼图/柱状图）
+- **目的**: 展示AI硬件市场产品形态分布
+- **数据源**: `product_type` 字段统计
+- **工具**: matplotlib.pyplot.pie() 或 seaborn.countplot()
+
+### 2. 用户情绪分析图（情感分类饼图）
+- **目的**: 评估用户对产品的整体情绪倾向
+- **数据源**: `sentiment` 字段分布
+- **扩展**: 可按平台分组对比
+
+### 3. 高频关键词词云图
+- **目的**: 提炼用户评论关注重点
+- **数据源**: `clean_text` 或 `keywords` 字段
+- **工具**: wordcloud库，支持中文字体
+
+### 4. 热度趋势时间图（折线图）
+- **目的**: 观察产品热度时间分布
+- **数据源**: `publish_date` + 互动量统计
+- **维度**: 按日/周/月聚合
+
+### 5. 点赞-评论散点图（互动热度）
+- **目的**: 识别高参与度产品类型
+- **数据源**: `likes` vs `comments_count`
+- **视觉编码**: 点大小=点赞量，颜色=情绪类别
+
+### 6. 平台对比雷达图
+- **目的**: 对比不同平台内容特征
+- **维度**: 平均点赞、评论量、正面情绪占比、产品多样性
+- **工具**: plotly.graph_objects.Scatterpolar
+
+### 7. 价格分布箱线图（淘宝数据）
+- **目的**: 分析产品价格区间和异常值
+- **数据源**: `price` 字段
+- **分组**: 按 `product_type` 分类展示
+
+## 可视化技术规范
+
+### 中文支持
+```python
+# matplotlib中文字体设置
+import matplotlib.pyplot as plt
+plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei']
+plt.rcParams['axes.unicode_minus'] = False
+
+# seaborn中文支持
+import seaborn as sns
+sns.set_style("whitegrid")
+sns.set_context("paper", font_scale=1.2)
+```
+
+### 色彩规范
+- **情绪分类**: 正面(绿色)、中性(灰色)、负面(红色)
+- **平台区分**: 小红书(粉色)、抖音(黑色)、淘宝(橙色)
+- **产品类型**: 使用色轮均匀分布的颜色
+
+### 图表样式
+- **标题**: 简洁明确，包含分析时间范围
+- **坐标轴**: 清晰标注单位和含义
+- **图例**: 位置适当，不遮挡数据
+- **数据标签**: 关键数值直接标注
+
+## 交互式图表
+使用plotly创建交互式图表，支持：
+- **缩放平移**: 时间序列图表
+- **hover信息**: 显示详细数据
+- **筛选功能**: 按平台、产品类型筛选
+- **导出功能**: 支持PNG、HTML格式
+
+## 图表输出规范
+### 文件格式
+- **静态图**: PNG (300dpi), PDF (矢量)
+- **交互图**: HTML文件
+- **报告用图**: SVG格式（可编辑）
+
+### 文件命名
+```
+visualizations_output/
+├── product_type_distribution.png
+├── sentiment_analysis_by_platform.png  
+├── keyword_wordcloud_overall.png
+├── interaction_heatmap_timeline.png
+├── platform_comparison_radar.png
+└── price_distribution_boxplot.png
+```
+
+## 可视化代码结构
+```python
+class VisualizationGenerator:
+    def __init__(self, data):
+        self.data = data
+        self.setup_chinese_font()
+    
+    def generate_product_distribution(self):
+        """产品类型分布图"""
+        pass
+    
+    def generate_sentiment_analysis(self):
+        """情绪分析图"""
+        pass
+    
+    def generate_wordcloud(self):
+        """词云图"""
+        pass
+    
+    def generate_interaction_scatter(self):
+        """互动散点图"""
+        pass
+    
+    def save_all_charts(self, output_dir):
+        """批量保存所有图表"""
+        pass

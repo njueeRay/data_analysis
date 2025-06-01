@@ -1,0 +1,242 @@
+---
+description: 中文自然语言处理指导
+globs: 
+alwaysApply: false
+---
+# 中文自然语言处理指导
+
+## 中文文本处理特殊性
+
+### 分词挑战
+- 中文没有天然的词边界分隔符
+- 词语分歧问题（如："研究生命的起源" 可分为不同组合）
+- 新词、网络用语识别困难
+- 专业术语和品牌名称处理
+
+### 情感分析特点
+- 中文情感表达更加含蓄和间接
+- 语序和语气助词对情感的影响
+- 二次元文化相关的特殊情感词汇
+- 网络用语和表情符号的情感倾向
+
+## 核心NLP工具配置
+
+### jieba分词器设置
+```python
+import jieba
+import jieba.posseg as pseg
+
+# 添加自定义词典（AI硬件相关）
+jieba.load_userdict("ai_hardware_dict.txt")
+
+# 自定义词典示例内容：
+# AI陪伴 3 n
+# 虚拟女友 3 n  
+# 智能音箱 3 n
+# 宠物机器人 3 n
+# 二次元 2 n
+
+def custom_tokenize(text):
+    """自定义分词函数"""
+    # 精确模式分词
+    words = jieba.lcut(text, cut_all=False)
+    # 过滤单字和停用词
+    words = [w for w in words if len(w) > 1 and w not in stopwords]
+    return words
+```
+
+### 停用词处理
+```python
+# 加载中文停用词表
+with open('chinese_stopwords.txt', 'r', encoding='utf-8') as f:
+    stopwords = set(f.read().strip().split('\n'))
+
+# 添加项目特定停用词
+custom_stopwords = {'真的', '就是', '感觉', '觉得', '可能', '应该'}
+stopwords.update(custom_stopwords)
+```
+
+### 情感分析工具
+```python
+from snownlp import SnowNLP
+
+def analyze_sentiment(text):
+    """中文情感分析"""
+    s = SnowNLP(text)
+    sentiment_score = s.sentiments
+    
+    if sentiment_score > 0.6:
+        return '正面'
+    elif sentiment_score < 0.4:
+        return '负面'
+    else:
+        return '中性'
+
+# 结合情感词典的方法
+def sentiment_with_dict(text, pos_dict, neg_dict):
+    """基于情感词典的分析"""
+    words = custom_tokenize(text)
+    pos_count = sum(1 for word in words if word in pos_dict)
+    neg_count = sum(1 for word in words if word in neg_dict)
+    
+    if pos_count > neg_count:
+        return '正面'
+    elif neg_count > pos_count:
+        return '负面'
+    else:
+        return '中性'
+```
+
+## AI硬件领域词典构建
+
+### 产品类型词典
+```python
+product_type_dict = {
+    'AI音箱': ['智能音箱', '语音助手', '小爱同学', '天猫精灵', '小度'],
+    '陪伴机器人': ['宠物机器人', '陪伴机器人', 'AI狗', 'AI猫', '智能宠物'],
+    '虚拟伴侣': ['虚拟女友', '虚拟男友', 'AI女友', 'AI伴侣'],
+    '二次元手办': ['智能手办', '会说话的手办', '语音手办', '动漫机器人'],
+    'AI玩具': ['智能玩具', 'AI玩偶', '会聊天的玩具']
+}
+```
+
+### 情感词典扩展
+```python
+# 正面情感词（AI硬件相关）
+positive_words = [
+    '可爱', '萌', '治愈', '温暖', '陪伴', '有趣', '智能', 
+    '好用', '实用', '值得', '推荐', '满意', '喜欢', '爱了'
+]
+
+# 负面情感词
+negative_words = [
+    '无聊', '鸡肋', '失望', '后悔', '坑', '垃圾', '难用',
+    '卡顿', '反应慢', '声音难听', '不值', '浪费钱'
+]
+
+# 二次元特色词汇
+anime_words = [
+    '老婆', '老公', '女神', '男神', '纸片人', '三次元', 
+    'waifu', '嫁给', '娶', 'CP', '攻受', '萌属性'
+]
+```
+
+## 文本预处理管道
+
+### 清洗流程
+```python
+import re
+
+def clean_chinese_text(text):
+    """中文文本清洗"""
+    # 去除URL
+    text = re.sub(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', '', text)
+    
+    # 去除@用户名
+    text = re.sub(r'@[\w\u4e00-\u9fff]+', '', text)
+    
+    # 去除多余的空格和换行
+    text = re.sub(r'\s+', ' ', text).strip()
+    
+    # 保留中文、英文、数字和常用标点
+    text = re.sub(r'[^\u4e00-\u9fff\u0030-\u0039\u0041-\u005a\u0061-\u007a\uff01-\uff5e\u3000-\u303f]', '', text)
+    
+    return text
+
+def extract_keywords(text, top_k=10):
+    """关键词提取"""
+    import jieba.analyse
+    
+    # TF-IDF关键词提取
+    keywords_tfidf = jieba.analyse.extract_tags(text, topK=top_k, withWeight=True)
+    
+    # TextRank关键词提取
+    keywords_textrank = jieba.analyse.textrank(text, topK=top_k, withWeight=True)
+    
+    return keywords_tfidf, keywords_textrank
+```
+
+## 特殊处理策略
+
+### 网络用语处理
+```python
+# 网络用语映射表
+internet_slang_dict = {
+    'yyds': '永远的神',
+    '绝绝子': '绝了',
+    '芭比Q': '完蛋了', 
+    '6': '厉害',
+    '666': '很厉害',
+    'awsl': '可爱死了',
+    'xswl': '笑死我了'
+}
+
+def normalize_internet_slang(text):
+    """网络用语标准化"""
+    for slang, normal in internet_slang_dict.items():
+        text = text.replace(slang, normal)
+    return text
+```
+
+### 表情符号处理
+```python
+import emoji
+
+def process_emojis(text):
+    """表情符号处理"""
+    # 提取表情符号
+    emoji_list = emoji.emoji_list(text)
+    
+    # 将表情转换为文字描述
+    text_with_emoji_desc = emoji.demojize(text, language='zh')
+    
+    # 或者直接移除表情
+    text_no_emoji = emoji.replace_emoji(text, replace='')
+    
+    return text_with_emoji_desc, emoji_list
+
+# 情感表情映射
+emoji_sentiment = {
+    '😊': 'positive', '😂': 'positive', '❤️': 'positive',
+    '😭': 'negative', '😡': 'negative', '💔': 'negative',
+    '😐': 'neutral', '🤔': 'neutral'
+}
+```
+
+## 数据质量控制
+
+### 文本质量评估
+```python
+def assess_text_quality(text):
+    """文本质量评估"""
+    quality_score = 0
+    
+    # 长度合理性（10-500字符）
+    if 10 <= len(text) <= 500:
+        quality_score += 1
+    
+    # 中文字符占比
+    chinese_chars = len(re.findall(r'[\u4e00-\u9fff]', text))
+    if chinese_chars / len(text) > 0.5:
+        quality_score += 1
+    
+    # 非重复字符比例
+    unique_chars = len(set(text))
+    if unique_chars / len(text) > 0.3:
+        quality_score += 1
+    
+    return quality_score >= 2
+```
+
+### 异常文本识别
+```python
+def detect_spam_text(text):
+    """垃圾文本识别"""
+    spam_indicators = [
+        '加微信', '优惠券', '限时特价', '点击链接',
+        '代购', '团购', '刷单', '广告'
+    ]
+    
+    spam_count = sum(1 for indicator in spam_indicators if indicator in text)
+    return spam_count >= 2
+```

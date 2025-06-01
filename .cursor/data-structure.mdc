@@ -1,0 +1,41 @@
+---
+description: 数据结构与字段规范
+globs: 
+alwaysApply: false
+---
+# 数据结构与字段规范
+
+## 统一数据字段模板
+项目使用统一的CSV数据结构，支持多平台数据整合。完整字段定义详见：[数据字段模板.md](mdc:guidance/数据字段模板.md)
+
+## 核心字段说明
+- `platform`: 数据来源平台（小红书/抖音/淘宝）
+- `product_type`: 产品分类（语音陪伴机器人/虚拟女友音箱等）
+- `title`: 内容标题
+- `content`: 正文或用户评论
+- `tags`: 标签列表
+- `likes`, `comments_count`, `shares`: 互动数据
+- `sales`, `price`: 商品数据（淘宝）
+- `publish_date`: 发布时间
+- `clean_text`: 清洗后的文本
+- `sentiment`: 情感分类（正面/中性/负面）
+- `keywords`: 关键词列表
+
+## 数据质量要求
+1. **时间格式**: 统一使用 YYYY-MM-DD 格式
+2. **文本清洗**: 去除特殊符号、表情、换行符
+3. **数值字段**: 缺失值统一设为0
+4. **编码格式**: 统一使用UTF-8
+5. **字段完整性**: 核心字段（platform, title, content）不允许为空
+
+## 目录结构规范
+```
+raw_data/           # 原始爬取数据
+├── xiaohongshu_raw.csv
+├── douyin_raw.csv
+└── taobao_raw.csv
+
+cleaned_data/       # 清洗后的标准化数据
+├── xiaohongshu_cleaned.csv
+├── douyin_cleaned.csv
+└── taobao_cleaned.csv

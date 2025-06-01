@@ -1,0 +1,35 @@
+---
+description: AI硬件分析项目总览
+globs: 
+alwaysApply: false
+---
+# AI硬件分析项目总览
+
+## 项目目标
+本项目旨在通过整合**小红书、抖音、淘宝**等平台的公开数据，分析当前市场上**AI陪伴类硬件（尤其是带二次元属性的产品）**的：
+- 产品类型与热点趋势
+- 用户反馈（情感、偏好、痛点）
+- 市场活跃度（互动量、发布时间段）
+- 潜在用户画像（偏好特征）
+
+## 项目结构
+项目遵循标准的数据分析流程，包含以下主要阶段：
+1. **数据采集阶段（Crawler）** - 爬取三大平台数据
+2. **数据清洗阶段（Cleaning）** - 标准化和清洗数据
+3. **数据分析阶段（Analysis）** - 情感分析、分类、聚类等
+4. **数据可视化（Visualization）** - 生成图表和报告
+
+## 指导文档索引
+- 任务需求总览：[任务需求.md](mdc:guidance/任务需求.md)
+- 数据结构标准：[数据字段模板.md](mdc:guidance/数据字段模板.md)
+- 分析内容规划：[分析内容.md](mdc:guidance/分析内容.md)
+- 爬虫实施策略：[爬虫策略.md](mdc:guidance/爬虫策略.md)
+- 数据处理方案：[数据处理与分析方案.md](mdc:guidance/数据处理与分析方案.md)
+- 可视化清单：[图表分析_示例清单.md](mdc:guidance/图表分析_示例清单.md)
+
+## 核心技术栈
+- **数据采集**: Selenium, Playwright, requests
+- **数据处理**: pandas, numpy
+- **中文分析**: jieba, SnowNLP
+- **可视化**: matplotlib, seaborn, plotly
+- **存储格式**: CSV, JSON
